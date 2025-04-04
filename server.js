@@ -11,7 +11,7 @@ const bodyParser = require("body-parser");
 // Import Routes
 const productRoutes = require("./routes/productRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
-const brandRoutes = require("./routes/brandRoutes");
+const brandRoutes = require("./routes/BrandRoutes");
 const bannerRoutes = require("./routes/bannerRoutes");
 const serviceRequestRoutes = require("./routes/serviceRequestRoutes");
 const salesRoutes = require("./routes/SalesRoutes");

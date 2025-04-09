@@ -8,20 +8,38 @@ const {
   getUserServiceRequests 
 } = require("../controllers/serviceRequestController");
 
-// Multer Storage for Images
+// Multer Storage for Files
 const storage = multer.diskStorage({
     destination: "uploads/",
     filename: (req, file, cb) => {
         cb(null, Date.now() + "-" + file.originalname);
     },
 });
-const upload = multer({ storage });
+
+const upload = multer({ 
+    storage,
+    fileFilter: (req, file, cb) => {
+        if (file.fieldname === "image") {
+            if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+                return cb(new Error('Only image files are allowed!'), false);
+            }
+        } else if (file.fieldname === "video") {
+            if (!file.originalname.match(/\.(mp4|mov|avi|wmv)$/)) {
+                return cb(new Error('Only video files are allowed!'), false);
+            }
+        }
+        cb(null, true);
+    }
+});
 
 // Protected Routes (Requires Authentication)
-router.post("/", protect, upload.single("image"), createServiceRequest);
+router.post("/", protect, upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'video', maxCount: 1 }
+]), createServiceRequest);
 router.get("/my-requests", protect, getUserServiceRequests); 
 
-// Public Route (No Authentication Required)
-router.get("/", getServiceRequests);  // Removed `protect`
+
+router.get("/", getServiceRequests);
 
 module.exports = router;

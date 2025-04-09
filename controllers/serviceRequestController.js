@@ -12,7 +12,8 @@ exports.createServiceRequest = async (req, res) => {
     }
 
     const { firstName, lastName, address, city, phoneNumber, brand, model } = req.body;
-    const imagePath = req.file ? req.file.filename : null;
+    const imagePath = req.files?.image ? req.files.image[0].filename : null;
+    const videoPath = req.files?.video ? req.files.video[0].filename : null;
 
     // Validate required fields
     if (!address || !phoneNumber || !brand || !model || !imagePath) {
@@ -32,6 +33,7 @@ exports.createServiceRequest = async (req, res) => {
       brand,
       model,
       image: imagePath,
+      video: videoPath, // Added video field
     });
 
     await newRequest.save();
@@ -73,11 +75,9 @@ exports.getServiceRequests = async (req, res) => {
   }
 };
 
-
 // Get service requests for current user
 exports.getUserServiceRequests = async (req, res) => {
   try {
-    // No need for userId parameter - we use the authenticated user
     const requests = await ServiceRequest.find({ user: req.user._id })
       .sort({ createdAt: -1 })
       .populate('user', 'firstName lastName email');

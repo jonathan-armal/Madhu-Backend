@@ -13,14 +13,51 @@ const getAllProducts = async (req, res) => {
 // Add a new product
 const addProduct = async (req, res) => {
   try {
-    const newProduct = new Product(req.body);
+    // Parse form data
+    const productData = {
+      name: req.body.name,
+      type: req.body.type,
+      price: parseFloat(req.body.price),
+      originalPrice: parseFloat(req.body.originalPrice),
+      discount: req.body.discount,
+      brand: req.body.brand,
+      description: req.body.description,
+      isTrending: req.body.isTrending === 'true',
+      isTopDiscounted: req.body.isTopDiscounted === 'true',
+      features: JSON.parse(req.body.features),
+      specification: JSON.parse(req.body.specification),
+    };
+
+    // Handle images
+    if (req.files && req.files.length > 0) {
+      productData.images = req.files.map(file => `${file.filename}`);
+    } else if (req.body.existingImages) {
+      // Handle existing images when editing
+      productData.images = Array.isArray(req.body.existingImages) 
+        ? req.body.existingImages 
+        : [req.body.existingImages];
+    } else {
+      productData.images = [];
+    }
+
+    const newProduct = new Product(productData);
     await newProduct.save();
-    res.status(201).json({ message: "Product added successfully", newProduct });
+    
+    res.status(201).json({ 
+      message: "Product added successfully", 
+      product: newProduct 
+    });
   } catch (error) {
     if (error.name === "ValidationError") {
-      return res.status(400).json({ message: "Validation Error", error: error.message });
+      return res.status(400).json({ 
+        message: "Validation Error", 
+        error: error.message 
+      });
     }
-    res.status(500).json({ message: "Error adding product", error });
+    res.status(500).json({ 
+      message: "Error adding product", 
+      error: error.message 
+    });
   }
 };
 

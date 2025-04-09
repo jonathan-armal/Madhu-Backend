@@ -18,13 +18,14 @@ const getBanner = async (req, res) => {
 // 📌 Add a new banner (POST)
 const postBanner = async (req, res) => {
     try {
-        const { title } = req.body;
+        const { title, description } = req.body;
         if (!req.file) {
             return res.status(400).json({ message: "Image is required" });
         }
 
         const newBanner = new Banner({
             title,
+            description,
             image: req.file.filename, // Store only the filename
         });
 
@@ -38,7 +39,7 @@ const postBanner = async (req, res) => {
 // 📌 Update the existing banner (PUT)
 const updateBanner = async (req, res) => {
     try {
-        const { title } = req.body;
+        const { title, description } = req.body;
         let banner = await Banner.findOne(); // Find the existing banner
 
         if (!banner) {
@@ -55,6 +56,8 @@ const updateBanner = async (req, res) => {
         }
 
         banner.title = title || banner.title;
+        banner.description = description || banner.description;
+
         await banner.save();
 
         res.json({ message: "Banner updated successfully!", banner });

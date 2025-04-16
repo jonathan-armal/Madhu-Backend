@@ -1,10 +1,10 @@
-const User = require("../models/User");
-const jwt = require("jsonwebtoken");
+const User = require('../models/User');
+const jwt = require('jsonwebtoken');
 
 // Register a new user
-const register = async (req, res) => {
+exports.register = async (req, res) => {
   try {
-    const { fullName, email, password, role, phone } = req.body;
+    const { name, email, phone, password, address } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -12,24 +12,47 @@ const register = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // Create new user
-    const user = new User({ fullName, email, password, role, phone });
+    // Create new user with address
+    const user = new User({ 
+      name, 
+      email, 
+      phone, 
+      password, 
+      address,
+      role: "user" 
+    });
+
     await user.save();
 
     // Generate JWT token
-    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { userId: user._id, role: user.role }, 
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
-    res.status(201).json({ message: "Registration successful", token });
+    res.status(201).json({ 
+      message: "Registration successful", 
+      token,
+      userId: user._id,
+      user: {
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        address: user.address
+      }
+    });
   } catch (error) {
-    console.error("Error during registration:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Registration error:", error);
+    res.status(500).json({ 
+      message: "Registration failed",
+      error: error.message 
+    });
   }
 };
 
 // Login user
-const login = async (req, res) => {
+exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -46,15 +69,45 @@ const login = async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { userId: user._id, role: user.role }, 
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
-    res.status(200).json({ message: "Login successful", token });
+    res.status(200).json({ 
+      message: "Login successful", 
+      token,
+      userId: user._id,
+      user: {
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        address: user.address
+      }
+    });
   } catch (error) {
-    console.error("Error during login:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Login error:", error);
+    res.status(500).json({ 
+      message: "Login failed",
+      error: error.message 
+    });
   }
 };
 
-module.exports = { register, login };
+// Get user profile
+exports.getProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    res.status(500).json({ 
+      message: "Failed to fetch profile",
+      error: error.message 
+    });
+  }
+};

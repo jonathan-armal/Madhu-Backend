@@ -17,7 +17,6 @@ const upload = multer({ storage });
 
 // Routes
 router.post("/add", upload.single("image"), addSalesBanner);
-
 router.delete("/delete", deleteSalesBanner);
 router.get("/", getSalesBanner);
 

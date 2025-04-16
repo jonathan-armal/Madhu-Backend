@@ -2,18 +2,24 @@ const SalesBanner = require("../models/Sales");
 const fs = require("fs");
 const path = require("path");
 
-// 📌 Add a New Banner (Only One)
+// Add a New Banner (Only One)
 const addSalesBanner = async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ message: "Image is required" });
         }
 
+        const { title, description, buttonText, buttonLink } = req.body;
+
         // Delete existing banner if one exists
         await SalesBanner.deleteMany({});
 
         const newBanner = new SalesBanner({
-            image: req.file.filename
+            image: req.file.filename,
+            title,
+            description,
+            buttonText: buttonText || "Shop Now",
+            buttonLink: buttonLink || "/products"
         });
 
         await newBanner.save();
@@ -23,7 +29,7 @@ const addSalesBanner = async (req, res) => {
     }
 };
 
-// 📌 Delete Banner
+// Delete Banner
 const deleteSalesBanner = async (req, res) => {
     try {
         const banner = await SalesBanner.findOne();
@@ -45,7 +51,7 @@ const deleteSalesBanner = async (req, res) => {
     }
 };
 
-// 📌 Get Current Banner
+// Get Current Banner
 const getSalesBanner = async (req, res) => {
     try {
         const banner = await SalesBanner.findOne();

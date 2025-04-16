@@ -114,7 +114,35 @@ const getProductByid = async (req, res) => {
       res.status(500).json({ message: "Error fetching trending products", error });
     }
   }
+ 
+  const importProducts = async (req, res) => {
+  try {
+    const { products } = req.body;
+    
+    if (!products || !Array.isArray(products)) {
+      return res.status(400).json({ message: "Invalid products data" });
+    }
 
+    // Insert multiple products
+    const result = await Product.insertMany(products);
+    
+    res.status(201).json({ 
+      message: "Products imported successfully",
+      count: result.length
+    });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ 
+        message: "Validation Error", 
+        error: error.message 
+      });
+    }
+    res.status(500).json({ 
+      message: "Error importing products", 
+      error: error.message 
+    });
+  }
+};
 
 module.exports = {
   getAllProducts,
@@ -122,5 +150,6 @@ module.exports = {
   updateProduct,
   deleteProduct, 
   getProductByid,
-  getTrandingProduct
+  getTrandingProduct,
+  importProducts
 };

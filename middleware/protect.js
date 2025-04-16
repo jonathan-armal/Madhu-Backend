@@ -18,7 +18,7 @@ exports.protect = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     // 3. Get user from token
-    req.user = await User.findById(decoded.id).select('-password');
+    req.user = await User.findById(decoded.userId).select('-password');
     
     if (!req.user) {
       return res.status(401).json({
@@ -27,8 +27,8 @@ exports.protect = async (req, res, next) => {
       });
     }
 
-    // 4. Add user to request
-    req.userId = req.user._id; // Explicitly set userId
+    // 4. Add user ID to request
+    req.userId = req.user._id;
     next();
   } catch (error) {
     console.error('Auth error:', error);

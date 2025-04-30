@@ -3,19 +3,23 @@ const Order = require('../models/Order');
 // Create new order
 exports.createOrder = async (req, res) => {
   try {
-    // Destructure fields from req.body (EXCLUDE userId)
-    const { fullName, phone, street, city, state, pincode, cartItems, subtotal,  total, paymentMethod } = req.body;
-    
-    // Validate authentication - middleware should handle this, but just in case
-if (!req.user || !req.user._id) { 
-      return res.status(401).json({ 
-        success: false,
-        message: "Authentication required" 
-      });
-    }
+    // Destructure required fields
+    const { 
+      fullName, 
+      phone, 
+      street, 
+      city, 
+      state, 
+      zip,  // Changed from pincode to match frontend
+      country, // Added to match frontend
+      cartItems, 
+      subtotal, 
+      total, 
+      paymentMethod 
+    } = req.body;
 
     // Validate required fields
-    const requiredFields = ['fullName', 'phone', 'street', 'city', 'state', 'pincode', 'cartItems', 'paymentMethod'];
+    const requiredFields = ['fullName', 'phone', 'street', 'city', 'state', 'zip', 'cartItems', 'paymentMethod'];
     const missingFields = requiredFields.filter(field => !req.body[field]);
     
     if (missingFields.length > 0) {
@@ -25,21 +29,22 @@ if (!req.user || !req.user._id) {
       });
     }
 
-    // Create order using ONLY the userId from the authenticated user (req.user.userId)
+    // Create order
     const newOrder = new Order({
-      userId: req.user.userId, // This comes from the JWT token via your protect middleware
+      userId: req.user._id,  // Changed from req.user.userId to match your auth middleware
       fullName,
       phone,
       street,
       city,
       state,
-      pincode,
+      zip,  // Changed from pincode
+      country, // Added
       cartItems: cartItems.map(item => ({
         productId: item.productId,
         name: item.name,
         quantity: item.quantity,
         price: item.price,
-        image: item.image || ''
+        images: item.images || [] // Changed from image to images array
       })),
       subtotal,
       total,
@@ -72,7 +77,7 @@ if (!req.user || !req.user._id) {
       error: error.message
     });
   }
-};;
+};
 
 // Get orders for a specific user
 exports.getUserOrders = async (req, res) => {

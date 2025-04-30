@@ -10,9 +10,11 @@ const bannerRoutes = require('./bannerRoutes');
 const serviceRequestRoutes = require('./serviceRequestRoutes');
 const reviewRoutes = require('./ReviewRoutes');
 const content1Routes = require('./content1Routes');
-
 const imageRoutes = require('./imageRoutes');
 const adminRoutes = require('./adminRoutes');
+const orderRoutes = require('./orderRoutes'); 
+const jobRoutes = require('./jobRoutes');
+const technicianRoutes = require('./technicianRoutes');
 
 // Mount routes
 router.use('/auth', authRoutes);
@@ -25,5 +27,8 @@ router.use('/reviews', reviewRoutes);
 router.use('/content1', content1Routes);
 router.use('/images', imageRoutes);
 router.use('/admin', adminRoutes);
+router.use('/orders', orderRoutes);    
+router.use('/jobs', jobRoutes);
+router.use('/technicians', technicianRoutes); // Add this line
 
 module.exports = router;

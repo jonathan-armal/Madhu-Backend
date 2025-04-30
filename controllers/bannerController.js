@@ -2,10 +2,10 @@ const Banner = require("../models/Banner");
 const fs = require("fs");
 const path = require("path");
 
-// 📌 Get the latest banner
+
 const getBanner = async (req, res) => {
     try {
-        const banner = await Banner.findOne().sort({ _id: -1 }); // Fetch the latest banner
+        const banner = await Banner.findOne().sort({ _id: -1 }); 
         if (!banner) {
             return res.status(404).json({ message: "No banner found" });
         }

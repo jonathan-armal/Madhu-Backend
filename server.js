@@ -130,16 +130,16 @@ app.get('/', (req, res) => {
 });
 
 // 404 Handler
-app.use((req, res, next) => {
-  res.status(404).json({
-    success: false,
-    message: 'Not Found',
-    error: {
-      statusCode: 404,
-      message: 'The requested resource was not found on this server'
-    }
-  });
-});
+// app.use((req, res, next) => {
+//   res.status(404).json({
+//     success: false,
+//     message: 'Not Found',
+//     error: {
+//       statusCode: 404,
+//       message: 'The requested resource was not found on this server'
+//     }
+//   });
+// });
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

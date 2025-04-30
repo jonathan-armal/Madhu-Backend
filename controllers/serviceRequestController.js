@@ -51,7 +51,8 @@ exports.createServiceRequest = async (req, res) => {
       error: error.message
     });
   }
-};
+};   
+
 
 // Get all service requests (admin only)
 exports.getServiceRequests = async (req, res) => {

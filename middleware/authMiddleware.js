@@ -2,11 +2,11 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const createError = require('http-errors');
 
+// 🔐 Middleware to protect routes (requires authentication)
 exports.protect = async (req, res, next) => {
   try {
-    // 1. Get token from header or cookie
     let token;
-    
+
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith('Bearer')
@@ -20,70 +20,60 @@ exports.protect = async (req, res, next) => {
       return next(createError(401, 'Not authorized, no token provided'));
     }
 
-    // 2. Verify token
+    // Verify token
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (verifyError) {
-      if (verifyError.name === 'TokenExpiredError') {
+      console.log('✅ Token verified. Decoded:', decoded);
+    } catch (err) {
+      if (err.name === 'TokenExpiredError') {
         return next(createError(401, 'Token expired, please login again'));
       }
       return next(createError(401, 'Not authorized, invalid token'));
     }
 
-    // 3. Get user from token
-    const user = await User.findById(decoded.id)
+    // Fetch user using decoded.userId
+    const user = await User.findById(decoded.userId)
       .select('-password -__v -createdAt -updatedAt')
       .lean();
 
     if (!user) {
+      console.error(`❌ User not found for ID: ${decoded.userId}`);
       return next(createError(401, 'User not found'));
     }
 
-    // 4. Check if user changed password after token was issued
+    // Check if password was changed after the token was issued
     if (user.passwordChangedAt) {
-      const changedTimestamp = parseInt(
-        user.passwordChangedAt.getTime() / 1000,
-        10
-      );
-      
+      const changedTimestamp = parseInt(user.passwordChangedAt.getTime() / 1000, 10);
       if (decoded.iat < changedTimestamp) {
-        return next(
-          createError(401, 'User recently changed password, please login again')
-        );
+        return next(createError(401, 'Password recently changed. Please log in again.'));
       }
     }
 
-    // 5. Attach user to request
     req.user = user;
-    
-    // 6. Add user to response locals for views if needed
     res.locals.user = user;
-    
     next();
-  } catch (error) {
-    console.error('Authentication error:', error);
-    next(error);
+  } catch (err) {
+    console.error('Auth error:', err);
+    next(createError(500, 'Internal Server Error'));
   }
 };
 
-// Role-based authorization
+// 👮 Role-based access control middleware
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return next(
-        createError(403, 'You do not have permission to perform this action')
-      );
+    if (!req.user || !roles.includes(req.user.role)) {
+      return next(createError(403, 'You do not have permission to perform this action'));
     }
     next();
   };
 };
 
-// Optional authentication for public routes
+// 🔓 Optional authentication (e.g., public pages with user info if logged in)
 exports.optionalAuth = async (req, res, next) => {
   try {
     let token;
-    
+
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith('Bearer')
@@ -95,19 +85,21 @@ exports.optionalAuth = async (req, res, next) => {
 
     if (token) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.id)
+      console.log('🔍 Optional Auth - Decoded:', decoded);
+
+      const user = await User.findById(decoded.userId)
         .select('-password -__v -createdAt -updatedAt')
         .lean();
-      
+
       if (user) {
         req.user = user;
         res.locals.user = user;
       }
     }
-    
+
     next();
   } catch (error) {
-    // Don't block the request if auth fails for optional auth
+    console.warn('⚠️ Optional authentication failed:', error.message);
     next();
   }
 };

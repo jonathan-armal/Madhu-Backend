@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const { protect } = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authMiddleware");     
+const { assignTechnician } = require('../controllers/technicianController');
 const { 
   createServiceRequest, 
   getServiceRequests, 
@@ -30,7 +31,8 @@ const upload = multer({
         }
         cb(null, true);
     }
-});
+});       
+router.put('/:id/assign', assignTechnician);
 
 // Protected Routes (Requires Authentication)
 router.post("/", protect, upload.fields([

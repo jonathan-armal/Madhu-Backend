@@ -11,7 +11,7 @@ const validateOrderInput = (req, res, next) => {
     "street", 
     "city", 
     "state", 
-    "pincode", 
+    "zip", 
     "cartItems",
     "subtotal",
    

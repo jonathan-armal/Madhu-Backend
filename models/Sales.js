@@ -1,20 +1,22 @@
+// Rename this file to salesBanner.js
 const mongoose = require("mongoose");
 
 const SalesBannerSchema = new mongoose.Schema({
     image: {
         type: String,
-        required: true
-    },
-    title: {
-        type: String,
-        required: true
-    },
-    description: {
-        type: String,
-        required: true
-    },
+        required: [true, "Image filename is required"],
+        trim: true
+    }
+}, {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+});
 
-}, { timestamps: true });
+// Virtual for image URL
+SalesBannerSchema.virtual('imageUrl').get(function () {
+    return `/uploads/${this.image}`;
+});
 
 const SalesBanner = mongoose.model("SalesBanner", SalesBannerSchema);
 

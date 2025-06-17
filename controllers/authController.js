@@ -98,7 +98,11 @@ exports.login = async (req, res) => {
 // Get user profile
 exports.getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select("-password");
+    const { userId } = req.body;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized access" });
+    }
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

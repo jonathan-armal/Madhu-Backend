@@ -15,6 +15,7 @@ const adminRoutes = require('./adminRoutes');
 const orderRoutes = require('./orderRoutes'); 
 const jobRoutes = require('./jobRoutes');
 const technicianRoutes = require('./technicianRoutes');
+const salesRoutes = require('./SalesRoutes');
 
 // Mount routes
 router.use('/auth', authRoutes);
@@ -29,6 +30,7 @@ router.use('/images', imageRoutes);
 router.use('/admin', adminRoutes);
 router.use('/orders', orderRoutes);    
 router.use('/jobs', jobRoutes);
-router.use('/technicians', technicianRoutes); // Add this line
+router.use('/technicians', technicianRoutes);
+router.use('/sales', salesRoutes);
 
 module.exports = router;

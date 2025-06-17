@@ -15,13 +15,13 @@ const hpp = require('hpp');
 const app = express();
 
 // Route Imports
-const routes = require('./routes'); // This will automatically look for index.js
+const routes = require('./routes/index');
 
 // Security & Middleware Setup
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
-  credentials: true
+  origin: 'http://localhost:3000', // Do NOT use '*'
+  credentials: true,               // Allow credentials (cookies, auth headers)
 }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));

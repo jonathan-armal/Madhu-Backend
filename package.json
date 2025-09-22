@@ -1,10 +1,10 @@
 {
-  "name": "ecommerce-backend",
+  "name": "Madhu Sewing Machine Sales And Services-backend",
   "version": "1.0.0",
-  "description": "Backend for Sewing Machine E-commerce and Service Management",
+  "description": "Backend for Madhu Sewing Machine Sales & Services ",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "nodemon server.js",
     "dev": "nodemon server.js"
   },
   "dependencies": {
@@ -35,4 +35,5 @@
   "devDependencies": {
     "nodemon": "^2.0.22"
   }
-}
+}  
+

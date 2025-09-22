@@ -96,16 +96,41 @@ exports.login = async (req, res) => {
 };
 
 // Get user profile
+// exports.getProfile = async (req, res) => {
+//   try {
+//     const { userId } = req.body;
+//     if (!userId) {
+//       return res.status(401).json({ message: "Unauthorized access" });
+//     }
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+//     res.status(200).json(user);
+//   } catch (error) {
+//     console.error("Error fetching profile:", error);
+//     res.status(500).json({ 
+//       message: "Failed to fetch profile",
+//       error: error.message 
+//     });
+//   }
+// }; 
+ 
+// In your authController.js
 exports.getProfile = async (req, res) => {
   try {
-    const { userId } = req.body;
+    // Accept both query params and body
+    const userId = req.query.userId || req.body.userId;
+    
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized access" });
     }
+    
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+    
     res.status(200).json(user);
   } catch (error) {
     console.error("Error fetching profile:", error);

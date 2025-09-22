@@ -10,7 +10,9 @@ router.post('/register', authController.register);
 router.post('/login', authController.login);
 
 // Protected profile route
-router.get('/profile', authController.getProfile);
+// router.get('/profile', authController.getProfile); 
+// Change from GET to POST
+router.post('/profile', authController.getProfile);
 
 
 

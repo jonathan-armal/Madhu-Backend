@@ -89,6 +89,7 @@ const updateJobStatus = asyncHandler(async (req, res) => {
 // @desc    Create new job
 // @route   POST /api/jobs
 // @access  Private/Admin
+
 const createJob = asyncHandler(async (req, res) => {
   const job = await Job.create(req.body);
   res.status(201).json({
